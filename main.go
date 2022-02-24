@@ -1,27 +1,26 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"guri"
 	"net/http"
 )
 
-type Engine struct{}
-
-func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	switch req.URL.Path {
-	case "/":
-		fmt.Fprintf(w, "URL.Path = %q\n", req.URL.Path)
-	case "/hello":
-		for k, v := range req.Header {
-			fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
-		}
-	default:
-		fmt.Fprintf(w, "404 NOT FOUND: %s\n", req.URL)
-	}
-}
-
 func main() {
-	engine := new(Engine)
-	log.Fatal(http.ListenAndServe(":9999", engine))
+	r := guri.New()
+	r.GET("/", func(c *guri.Context) {
+		c.HTML(http.StatusOK, "<H1>Hello Guri</h1>")
+	})
+
+	r.GET("/hello", func(c *guri.Context) {
+		c.String(http.StatusOK, "hello %s, you are at %s\n", c.Query("name"), c.Path)
+	})
+
+	r.POST("/login", func(c *guri.Context) {
+		c.JSON(http.StatusOK, guri.H {
+			"username": c.PostForm("username"),
+			"password": c.PostForm("password"),
+		})
+	})
+
+	r.Run(":9999")
 }
