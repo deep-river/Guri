@@ -2,6 +2,7 @@ package guri
 
 import "net/http"
 
+// 以map结构存储路由表
 type router struct {
 	handlers map[string]HandlerFunc
 }

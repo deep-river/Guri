@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+// Context针对一次会话而设计，Context 随着每一个请求的出现而产生，请求的结束而销毁，和当前请求强相关的信息都应由 Context 承载。因此，设计 Context 结构，扩展性和复杂性留在了内部，而对外简化了接口。
+
 type H map[string]interface{}
 
 type Context struct {
