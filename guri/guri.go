@@ -12,6 +12,7 @@ type Engine struct {
 	router *router
 }
 
+// 框架的构造函数
 func New() *Engine {
 	return &Engine {router: newRouter()}
 }
