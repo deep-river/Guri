@@ -6,8 +6,10 @@ import (
 	"net/http"
 )
 
-// Context针对一次会话而设计，Context 随着每一个请求的出现而产生，请求的结束而销毁，和当前请求强相关的信息都应由 Context 承载。因此，设计 Context 结构，扩展性和复杂性留在了内部，而对外简化了接口。
+// 上下文 Context，用于让框架使用者高效构造http相应
+// Context 针对会话而设计，随着每一个请求的出现产生，请求的结束销毁，和当前请求强相关的信息都应由 Context 承载。因此，设计 Context 结构，扩展性和复杂性留在了内部，而对外简化了接口。
 
+// 别名guri.H
 type H map[string]interface{}
 
 type Context struct {
@@ -15,9 +17,11 @@ type Context struct {
 	Req        *http.Request
 	Path       string
 	Method     string
+	Params map[string]string
 	StatusCode int
 }
 
+// Cpntext 包含了http.ResponseWriter和*http.Request，并提供了对 Method 和 Path 这两个常用属性的直接访问
 func newContext(w http.ResponseWriter, req *http.Request) *Context {
 	return &Context {
 		Writer: w,
@@ -25,6 +29,11 @@ func newContext(w http.ResponseWriter, req *http.Request) *Context {
 		Path: req.URL.Path,
 		Method: req.Method,
 	}
+}
+
+func (c *Context) Param(key string) string {
+	value, _ := c.Params[key]
+	return value
 }
 
 func (c *Context) PostForm(key string) string {

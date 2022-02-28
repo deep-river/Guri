@@ -21,9 +21,10 @@ func (n *node) insert(pattern string, parts []string, height int) {
 		n.pattern = pattern
 		return
 	}
-
+	// 先在树中查找是否已存在相同节点
 	part := parts[height]
 	child := n.matchChild(part)
+	// 如果树中不存在匹配的节点，则新建节点
 	if child == nil {
 		child = &node{part: part, isWild: part[0] == ':' || part[0] == '*'}
 		n.children = append(n.children, child)
@@ -32,7 +33,7 @@ func (n *node) insert(pattern string, parts []string, height int) {
 }
 
 func (n *node) search(parts []string, height int) *node {
-	if len(parts) == height || strings.HasPrefix(n.part, '*') {
+	if len(parts) == height || strings.HasPrefix(n.part, "*") {
 		if n.pattern == "" {
 			return nil
 		}
@@ -52,12 +53,12 @@ func (n *node) search(parts []string, height int) *node {
 	return nil
 }
 
-func (n *node) travel(list *([]*node)) {
+func (n *node) traversal(list *([]*node)) {
 	if n.pattern != "" {
 		*list = append(*list, n)
 	}
 	for _, child := range n.children {
-		child.travel(list)
+		child.traversal(list)
 	}
 }
 

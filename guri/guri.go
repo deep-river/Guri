@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// 提供给框架用户，用来定义路由映射的处理方法
 type HandlerFunc func(*Context)
 
 type Engine struct {
