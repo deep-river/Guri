@@ -21,6 +21,7 @@ type Context struct {
 	StatusCode int
 	handlers []HandlerFunc
 	index int
+	engine *Engine
 }
 
 // Cpntext 包含了http.ResponseWriter和*http.Request，并提供了对 Method 和 Path 这两个常用属性的直接访问
@@ -89,8 +90,11 @@ func (c *Context) Data(code int, data []byte) {
 	c.Writer.Write(data)
 }
 
-func (c *Context) HTML(code int, html string) {
+func (c *Context) HTML(code int, name string, data interface{}) {
 	c.SetHeader("Context-Type", "text/html")
 	c.Status(code)
-	c.Writer.Write([]byte(html))
+	// c.Writer.Write([]byte(html))
+	if err := c.engine.htmlTemplates.ExecuteTemplate(c.Writer, name, data); err != nil {
+		c.Fail(500, err.Error())
+	}
 }
