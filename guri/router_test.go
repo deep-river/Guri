@@ -18,8 +18,14 @@ func newTestRouter() *router {
 
 func TestParsePattern(t *testing.T) {
 	ok := reflect.DeepEqual(parsePattern("/p/:name"), []string{"p", ":name"})
+	// fmt.Println(ok, parsePattern("/p/:name"))
+	// fmt.Printf("%v\n", []string{"p", ":name"})
 	ok = ok && reflect.DeepEqual(parsePattern("/p/*"), []string{"p", "*"})
-	ok = ok && reflect.DeepEqual(parsePattern("/p/*name/*"), []string{"P", "*name"})
+	// fmt.Println(ok, parsePattern("/p/*"))
+	// fmt.Printf("%v\n", []string{"p", "*"})
+	ok = ok && reflect.DeepEqual(parsePattern("/p/*name/*"), []string{"p", "*name"})
+	// fmt.Println(ok, parsePattern("/p/*name/*"))
+	// fmt.Printf("%v\n", []string{"p", "*name"})
 	if !ok {
 		t.Fatal("test parsePattern failed")
 	}
@@ -31,11 +37,11 @@ func TestGetRoute(t *testing.T) {
 	if n == nil {
 		t.Fatal("returned nil value")
 	}
-	if n.pattern != "hello/:name" {
-		t.Fatal("pattern does not match /hello/:name")
+	if n.pattern != "/hello/:name" {
+		t.Fatal("pattern does not match /hello/:name -- ", n.pattern)
 	}
 	if ps["name"] != "testName" {
-		t.Fatal("name does nto match testName")
+		t.Fatal("name does not match testName --", ps["name"])
 	}
-	fmt.Printf("matched pathL: %s, params['name']: %s\n", n.pattern, ps["name"])
+	fmt.Printf("matched path: %s, params['name']: %s\n", n.pattern, ps["name"])
 }

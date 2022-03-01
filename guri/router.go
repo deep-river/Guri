@@ -31,6 +31,7 @@ func parsePattern(pattern string) []string {
 			}
 		}
 	}
+	// fmt.Printf("%v\n", parts)
 	return parts
 }
 
