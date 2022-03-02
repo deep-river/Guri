@@ -35,6 +35,12 @@ func New() *Engine {
 	return engine
 }
 
+func Default() *Engine {
+	engine := New()
+	engine.Use(Logger(), Recovery())
+	return engine
+}
+
 // 创建新的子RouterGroup
 // 所有的group都引用同一个Engine实例
 func (group *RouterGroup) Group(prefix string) *RouterGroup {

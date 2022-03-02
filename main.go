@@ -16,19 +16,15 @@ func v2APILogger() guri.HandlerFunc {
 }
 
 func main() {
-	r := guri.New()
-	r.Use(guri.Logger())
-	r.GET("/", func(c *guri.Context) {
-		c.HTML(http.StatusOK, "<h1>Index Page</h1>")
-	})
+	r := guri.Default()
 
-	v2 := r.Group("/v2") 
-	v2.Use(v2APILogger())
-	{
-		v2.GET("/hello/:name", func(c *guri.Context) {
-			c.String(http.StatusOK, "hello %s, you are at %s\n", c.Param("name"), c.Path)
-		})
-	}
+	r.GET("/", func(c *guri.Context) {
+		c.String(http.StatusOK, "Hello traveler\n")
+	})
+	r.GET("/panic_test", func(c *guri.Context) {
+		names := []string{"guri"}
+		c.String(http.StatusOK, names[100])
+	})
 
 	r.Run(":9999")
 }
