@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// 以map结构存储的路由映射表
+// 路由映射表
 // key为 请求方法-路由地址
 // value为映射的处理方法
 type router struct {

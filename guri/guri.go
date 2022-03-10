@@ -8,25 +8,25 @@ import (
 	"strings"
 )
 
-// 提供给框架用户，用来定义路由映射的处理方法
+// 自定义的路由映射处理方法
 type HandlerFunc func(*Context)
 
 type (
 	Engine struct {
 		*RouterGroup
 		router *router
-		groups []*RouterGroup
+		groups []*RouterGroup // 路由分组
 		htmlTemplates *template.Template
-		funcMap template.FuncMap
+		funcMap template.FuncMap // 自定义template渲染函数
 	}
+	// 路由组
 	RouterGroup struct {
 		prefix string
 		engine *Engine
 		parent *RouterGroup
-		middlewares []HandlerFunc
+		middlewares []HandlerFunc // 应用的中间件
 	}
 )
-
 // 框架的构造函数
 func New() *Engine {
 	engine := &Engine {router: newRouter()}
@@ -34,13 +34,12 @@ func New() *Engine {
 	engine.groups = []*RouterGroup{engine.RouterGroup}
 	return engine
 }
-
+// 默认使用Logger Recovery的框架构造函数
 func Default() *Engine {
 	engine := New()
 	engine.Use(Logger(), Recovery())
 	return engine
 }
-
 // 创建新的子RouterGroup
 // 所有的group都引用同一个Engine实例
 func (group *RouterGroup) Group(prefix string) *RouterGroup {
@@ -53,9 +52,17 @@ func (group *RouterGroup) Group(prefix string) *RouterGroup {
 	engine.groups = append(engine.groups, newGroup)
 	return newGroup
 }
-
+// 注册使用中间件
 func (group *RouterGroup)Use(middlewares ...HandlerFunc) {
 	group.middlewares = append(group.middlewares, middlewares ...)
+}
+// 注册GET路由
+func (group *RouterGroup) GET(pattern string, handler HandlerFunc) {
+	group.addRoute("GET", pattern, handler)
+}
+// 注册POST路由
+func (group *RouterGroup) POST(pattern string, handler HandlerFunc) {
+	group.addRoute("POST", pattern, handler)
 }
 
 func (group *RouterGroup) addRoute(method string, comp string, handler HandlerFunc) {
@@ -63,13 +70,11 @@ func (group *RouterGroup) addRoute(method string, comp string, handler HandlerFu
 	log.Printf("Route %4s - %s", method, pattern)
 	group.engine.router.addRoute(method, pattern, handler)
 }
-
-func (group *RouterGroup) GET(pattern string, handler HandlerFunc) {
-	group.addRoute("GET", pattern, handler)
-}
-
-func (group *RouterGroup) POST(pattern string, handler HandlerFunc) {
-	group.addRoute("POST", pattern, handler)
+// 静态文件路由
+func (group *RouterGroup) Static(relativePath string, root string) {
+	handler := group.createStaticHandler(relativePath, http.Dir(root))
+	urlPattern := path.Join(relativePath, "/*fielpath")
+	group.GET(urlPattern, handler)
 }
 
 func (group *RouterGroup) createStaticHandler(relativePath string, fs http.FileSystem) HandlerFunc {
@@ -84,17 +89,11 @@ func (group *RouterGroup) createStaticHandler(relativePath string, fs http.FileS
 		fileServer.ServeHTTP(c.Writer, c.Req)
 	}
 }
-
-func (group *RouterGroup) Static(relativePath string, root string) {
-	handler := group.createStaticHandler(relativePath, http.Dir(root))
-	urlPattern := path.Join(relativePath, "/*fielpath")
-	group.GET(urlPattern, handler)
-}
-
+// 设置自定义渲染函数
 func (engine *Engine) SetFuncMap(funcMap template.FuncMap) {
 	engine.funcMap = funcMap
 }
-
+// 加载HTML模板
 func (engine *Engine) LoadHTMLGlob(pattern string) {
 	engine.htmlTemplates = template.Must(template.New("").Funcs(engine.funcMap).ParseGlob((pattern)))
 }
