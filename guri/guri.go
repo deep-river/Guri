@@ -99,9 +99,11 @@ func (engine *Engine) LoadHTMLGlob(pattern string) {
 }
 
 func (engine *Engine) Run(addr string) (err error) {
+	// http.ListenAndServe(addr string, handler http.Handler) error
 	return http.ListenAndServe(addr, engine)
 }
 
+// 实现 Handler接口的 ServeHTTP方法
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var middlewares []HandlerFunc
 	for _, group := range engine.groups {
@@ -114,3 +116,4 @@ func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	c.engine = engine
 	engine.router.handle(c)
 }
+

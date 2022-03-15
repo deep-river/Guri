@@ -6,12 +6,10 @@ import (
 	"net/http"
 )
 
-// 上下文 Context，用于让框架使用者高效构造http响应
-// Context 针对会话而设计，随着每一个请求的出现产生，请求的结束销毁，和当前请求强相关的信息都应由 Context 承载。因此，设计 Context 结构，扩展性和复杂性留在了内部，而对外简化了接口。
-
-// 别名guri.H
+// 别名 guri.H
 type H map[string]interface{}
 
+// 上下文 Context，用于包装 Header, ContentType等字段属性，简化相关接口的调用，方便高效构造http响应。和当前请求强相关的信息都由 Context 承载。
 type Context struct {
 	Writer     http.ResponseWriter
 	Req        *http.Request
@@ -24,7 +22,6 @@ type Context struct {
 	engine *Engine
 }
 
-// Cpntext 包含了http.ResponseWriter和*http.Request，并提供了对 Method 和 Path 这两个常用属性的直接访问
 func newContext(w http.ResponseWriter, req *http.Request) *Context {
 	return &Context {
 		Writer: w,
